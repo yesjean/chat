@@ -1,13 +1,11 @@
 package com.example.chat.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "messages")
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,6 +14,8 @@ public class Message {
     private String roomId;
     private String username;
     private String content;
+
+    @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
     public Long getId() {

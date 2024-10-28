@@ -1,6 +1,0 @@
-app = "<yesjean-chat-app>"  # 애플리케이션 이름을 설정합니다.
-
-[env]
-SPRING_DATASOURCE_URL="jdbc:postgresql://<your-supabase-host>:5432/<your-database>"
-SPRING_DATASOURCE_USERNAME="<your-username>"
-SPRING_DATASOURCE_PASSWORD="<your-password>"
