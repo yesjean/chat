@@ -11,8 +11,10 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.util.UriTemplate;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -28,10 +30,22 @@ public class ChatHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
+    public void afterConnectionEstablished(WebSocketSession session) throws IOException {
         String roomId = getRoomId(session);
         roomSessions.computeIfAbsent(roomId, k -> new CopyOnWriteArrayList<>()).add(session);
+
+        // 방에 있는 이전 메시지를 불러오기
+        List<Message> previousMessages = messageRepository.findByRoomId(roomId);
+        for (Message msg : previousMessages) {
+            String formattedMessage = msg.getUsername() + ": " + msg.getContent();
+            try {
+                session.sendMessage(new TextMessage(formattedMessage));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
+
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
