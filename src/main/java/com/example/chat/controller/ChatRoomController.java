@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/chatrooms")
 public class ChatRoomController {
@@ -18,5 +20,11 @@ public class ChatRoomController {
     public ResponseEntity<ChatRoom> createChatRoom(@RequestBody ChatRoom chatRoom) {
         ChatRoom savedRoom = chatRoomRepository.save(chatRoom);
         return ResponseEntity.ok(savedRoom);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ChatRoom>> getAllChatRooms() {
+        List<ChatRoom> chatRooms = chatRoomRepository.findAll();
+        return ResponseEntity.ok(chatRooms);
     }
 }

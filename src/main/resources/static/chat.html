@@ -15,6 +15,8 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       overflow: hidden;
+      display: flex;
+      height: 800px;
     }
     h2 {
       background-color: #007bff;
@@ -26,7 +28,7 @@
     #messages {
       list-style-type: none;
       padding: 20px;
-      height: 300px;
+      height: 80%;
       overflow-y: auto;
       background: #f9f9f9;
     }
@@ -73,7 +75,7 @@
       margin: 5px 0;
     }
     #room-container button {
-      width: 100px;
+      width: 120px;
       padding: 10px;
       border: none;
       background-color: #28a745;
@@ -84,31 +86,92 @@
     #room-container button:hover {
       background-color: #218838;
     }
+    #search-container {
+      margin-top: 20px;
+      padding: 10px;
+      background: #ffffff;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      width: 200px;
+    }
+
+    #room-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #room-list li {
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      background-color: #e9ecef;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #room-list li:hover {
+      background-color: #007bff;
+      color: white;
+    }
+
   </style>
 </head>
 <body>
 <div id="chat-container">
   <h2>Chat Room</h2>
   <div id="room-container">
-    <div id="room-number-container">
-      <input type="text" id="roomId" placeholder="Enter room number" required/>
-      <button onclick="createRoom()">Create Room</button>
+    <div id="search-container">
+      <button onclick="searchRooms()">Search Rooms</button>
+      <ul id="room-list"></ul>
     </div>
-    <div id="join-container">
-      <input type="text" id="username" placeholder="Enter your name" required/>
-      <button onclick="joinRoom()">Join Room</button>
+    <div style="display: flex; flex-direction: column; padding: 15px">
+      <div id="room-number-container">
+        <input type="text" id="roomId" placeholder="Enter room number" required/>
+        <button onclick="createRoom()">Create Room</button>
+      </div>
+      <div id="join-container">
+        <input type="text" id="username" placeholder="Enter your name" value="undefined1" required/>
+        <button onclick="joinRoom()">Join Room</button>
+      </div>
     </div>
   </div>
 
-  <ul id="messages"></ul>
-  <div id="input-container" style="display: none;">
-    <input type="text" id="message" placeholder="Type your message..." required/>
-    <button onclick="sendMessage()">Send</button>
+  <div style="display: flex; flex-direction: column">
+    <ul id="messages"></ul>
+    <div id="input-container" style="display: none;">
+      <input type="text" id="message" placeholder="Type your message..." required/>
+      <button onclick="sendMessage()">Send</button>
+    </div>
   </div>
 </div>
 
 <script>
   let ws;
+  // 방 목록 검색 함수
+  function searchRooms() {
+    fetch('/api/chatrooms')
+            .then(response => response.json())
+            .then(data => {
+              const roomList = document.getElementById('room-list');
+              roomList.innerHTML = '';  // 기존 목록 지우기
+
+              data.forEach(room => {
+                const roomItem = document.createElement('li');
+                roomItem.textContent = `Room ${room.id}: ${room.name}`;
+
+                // 방 선택 시 해당 방 번호로 설정하고 바로 입장 가능
+                roomItem.onclick = () => {
+                  document.getElementById('roomId').value = room.name;
+                };
+                roomList.appendChild(roomItem);
+              });
+            })
+            .catch(error => {
+              console.error('Error fetching rooms:', error);
+              alert("An error occurred while fetching rooms.");
+            });
+  }
 
   function createRoom() {
     const roomId = document.getElementById('roomId').value;
